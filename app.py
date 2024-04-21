@@ -2,6 +2,7 @@ import streamlit as st
 from PyPDF2 import PdfReader
 import os
 import torch
+import toml
 from dotenv import load_dotenv
 import google.generativeai as genai
 from pinecone import Pinecone
@@ -10,8 +11,10 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 load_dotenv()
 st.set_page_config(layout="wide") 
-pinecone_api_key=os.getenv("PINECONE_API_KEY")
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# pinecone_api_key=os.getenv("PINECONE_API_KEY")
+config = toml.load('config.toml')
+pinecone_api_key=config['api']['PINECONE_API_KEY']
+genai.configure(api_key=config['api']['GEMINI_API_KEY'])
 
 
 index_name="rag"
