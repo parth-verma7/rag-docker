@@ -3,13 +3,16 @@ from PyPDF2 import PdfReader
 import os
 import torch
 from dotenv import load_dotenv
-from pinecone import Pinecone, PodSpec
+import google.generativeai as genai
+from pinecone import Pinecone
 from transformers import AutoTokenizer, AutoModel
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 load_dotenv()
 st.set_page_config(layout="wide") 
 pinecone_api_key=os.getenv("PINECONE_API_KEY")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
 
 index_name="rag"
 pc = Pinecone(api_key=pinecone_api_key)
@@ -80,7 +83,7 @@ if uploaded_file:
             query_embeddings=get_embeddings(query).tolist()
 
             res=index.query(
-                vector=query_embeddings, top_k=2, 
+                vector=query_embeddings, top_k=5, 
                 namespace=namespace_name
             )
 
@@ -88,6 +91,17 @@ if uploaded_file:
             for i in res["matches"]:
                 final+=i["id"]
             
-            st.text_area("Results: ",value=final)
+            # st.write(final)
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content(f'''
+                User's Query - {query}
+                Response received from Database - {final}
+                You need to frame this response into complete sentences.
+                Ensure that the exact meaning of response does not change and try to make only lil modifications in the response.
+                Also if the query is present in the response, try to frame response as an answer of query but not displaying the query as it is.
+            ''')
+
+            st.write(response.text)
+            # st.text_area("Results: ",value=final)
 
 
