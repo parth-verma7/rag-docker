@@ -12,9 +12,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 load_dotenv()
 st.set_page_config(layout="wide") 
 # pinecone_api_key=os.getenv("PINECONE_API_KEY")
-config = toml.load('config.toml')
-pinecone_api_key=config['api']['PINECONE_API_KEY']
-genai.configure(api_key=config['api']['GEMINI_API_KEY'])
+# config = toml.load('config.toml')
+pinecone_api_key=st.secrets["api"]["PINECONE_API_KEY"]
+genai.configure(api_key=st.secrets['api']['GEMINI_API_KEY'])
 
 
 index_name="rag"
